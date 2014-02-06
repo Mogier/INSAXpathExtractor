@@ -1,0 +1,20 @@
+{
+   "background": {
+      "page": "background.html"
+   },
+   "content_scripts": [ {
+      "css": [ "content.css" ],
+      "js": [ "content.js" ],
+      "matches": [ "\u003Call_urls\u003E" ]
+   } ],
+   "description": "Extract, edit, and evaluate XPath queries with ease.",
+   "icons": {
+      "128": "static/icon128.png",
+      "32": "static/icon32.png",
+      "48": "static/icon48.png"
+   },
+   "manifest_version": 2,
+   "name": "INSAXpathExtractor",
+   "version": "1.0.13",
+   "web_accessible_resources": [ "bar.css", "bar.html", "bar.js" ]
+}
