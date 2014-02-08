@@ -203,11 +203,13 @@ xh.Bar.prototype.updateQueryAndBar_ = function(el) {
 
 xh.Bar.prototype.updateBar_ = function(update_query) {
   var results = this.query_ ? xh.evaluateQuery(this.query_) : ['', 0];
+  var url = window.location.href;
 
   var request = {
     'type': 'update',
     'query': update_query ? this.query_ : null,
     'results' : results,
+    'url' : url,
   };
   chrome.extension.sendMessage(request);
 };

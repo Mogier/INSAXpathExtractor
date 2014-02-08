@@ -29,6 +29,7 @@ var X_KEYCODE = 77;
 var queryEl = document.getElementById('query');
 var labelEl = document.getElementById('label');
 var queryResults;
+var currentURL;
 
 // Used by handleMouseMove() to enforce a cooldown period on relocate.
 var mostRecentRelocateTimeInMs = 0;
@@ -42,9 +43,10 @@ var evaluateQuery = function() {
 };
 
 var handleRequest = function(request, sender, callback) {
-  // Note: Setting textarea's value and text node's nodeValue is XSS-safe.
   if (request['type'] === 'update') {
-    if (request['query'] !== null) {
+    if(request['url']!==null) {
+      currentURL=request['url'];
+    }if (request['query'] !== null) {
       queryEl.value = request['query'];
       labelEl.value="";
     }if (request['results'] !== null) {
@@ -77,16 +79,15 @@ var handleKeyDown = function(e) {
 };
 
 function saveToLocalStorage(){
-  var siteURL = window.location.href;
   var siteJSON = {};
   var nodes=[];
 
-  if(localStorage[siteURL]) {
-    siteJSON=JSON.parse(localStorage.getItem(siteURL));
+  if(localStorage[currentURL]) {
+    siteJSON=JSON.parse(localStorage.getItem(currentURL));
     nodes = siteJSON.nodes;
   }
   else {
-    siteJSON.url = siteURL;
+    siteJSON.url = currentURL;
   }
 
   var currentNodeJSON = {};
@@ -98,7 +99,7 @@ function saveToLocalStorage(){
 
   siteJSON.nodes=nodes;
 
-  localStorage.setItem(siteURL,JSON.stringify(siteJSON));
+  localStorage.setItem(currentURL,JSON.stringify(siteJSON));
 }
 
 var saveBtn = document.getElementById("saveBtn");
