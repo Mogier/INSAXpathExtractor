@@ -29,6 +29,7 @@ var xh = xh || {};
 // Generic helper functions and constants
 
 xh.SHIFT_KEYCODE = 16;
+xh.CTRL_KEYCODE = 17;
 xh.X_KEYCODE = 77;
 
 xh.bind = function(object, method) {
@@ -91,7 +92,6 @@ xh.makeQueryForElement = function(el) {
 };
 
 xh.highlightNodes = function(nodes) {
-  console.log("node : " + nodes.length);
   for (var i = 0, l = nodes.length; i < l; i++) {
     nodes[i].className += ' xh-highlight';
   }
@@ -214,6 +214,19 @@ xh.Bar.prototype.updateBar_ = function(update_query) {
   chrome.extension.sendMessage(request);
 };
 
+xh.Bar.prototype.highlights = function() {
+  xh.clearHighlights();
+  var url = window.location.href;
+
+  var request = {
+    'type': 'high',
+    'url' : url,
+  };
+  chrome.runtime.sendMessage(request, function(response){
+    alert("coucou");
+  });
+};
+
 xh.Bar.prototype.showBar_ = function() {
   this.barFrame_.style.height = this.barHeightInPx_ + 'px';
   document.addEventListener('mousemove', this.boundMouseMove_);
@@ -247,6 +260,18 @@ xh.Bar.prototype.handleRequest_ = function(request, sender, callback) {
   } else if (request['type'] === 'hideBar') {
     this.hideBar_();
     window.focus();
+  } else if (request['type'] === 'nodesHighs') {
+    var queries = request['queries'];
+    var nodes=[];
+    for(var i=0;i<queries.length;i++){
+      var xpathResult = document.evaluate(queries[i], document, null, XPathResult.ANY_TYPE, null);
+      if (xpathResult.resultType === XPathResult.UNORDERED_NODE_ITERATOR_TYPE) {
+        for (var it = xpathResult.iterateNext(); it; it = xpathResult.iterateNext()) {
+          nodes.push(it);
+        }
+      }
+    }
+    xh.highlightNodes(nodes);
   }
 };
 
@@ -283,6 +308,9 @@ xh.Bar.prototype.keyDown_ = function(e) {
   // key that triggered this event.
   if (this.active_ && e.keyCode === xh.SHIFT_KEYCODE && !e.ctrlKey) {
     this.updateQueryAndBar_(this.currEl_);
+  }   
+  else if(this.active_ && e.keyCode === xh.CTRL_KEYCODE && !e.shiftKey) {
+    this.highlights();
   }
 };
 

@@ -28,8 +28,12 @@ var X_KEYCODE = 77;
 // Global variables.
 var queryEl = document.getElementById('query');
 var labelEl = document.getElementById('label');
-var queryResults;
+var resultsEl = document.getElementById('results');
+var nodeCountEl = document.getElementById('node-count');
 var currentURL;
+
+var nodeCountText = document.createTextNode('0');
+nodeCountEl.appendChild(nodeCountText);
 
 // Used by handleMouseMove() to enforce a cooldown period on relocate.
 var mostRecentRelocateTimeInMs = 0;
@@ -42,7 +46,7 @@ var evaluateQuery = function() {
   chrome.extension.sendMessage(request);
 };
 
-var handleRequest = function(request, sender, callback) {
+var handleRequest = function(request, sender, sendResponse) {
   if (request['type'] === 'update') {
     if(request['url']!==null) {
       currentURL=request['url'];
@@ -50,12 +54,40 @@ var handleRequest = function(request, sender, callback) {
       queryEl.value = request['query'];
       labelEl.value="";
     }if (request['results'] !== null) {
-      queryResults = request['results'];
-      if (queryResults[1]>1)
-        console.log("Warning ! More than 1 match for this XPath : " + queryEl.value);
+      resultsEl.value = request['results'][0];
+      nodeCountText.nodeValue = request['results'][1];
+      if(request['results'][1]>1)
+        console.log("More than 1 match for this query : " + queryEl.value);  
     }
   }
+  else if(request['type']==='high') {
+    var queries = extractQueries();
+
+    if(queries!=null) {
+      var newRequest = {
+        'type': 'nodesHighs',
+        'queries': queries
+      };
+      chrome.extension.sendMessage(newRequest);
+    }
+    labelEl.focus();
+  }
 };
+
+var extractQueries = function() {
+  if(localStorage[currentURL]) {
+    var currentSiteJSON = JSON.parse(localStorage.getItem(currentURL));
+    var nodes = currentSiteJSON.nodes;
+    var queries=[];
+
+    for (var i = 0; i<nodes.length; i++) {
+      var currentQuery=nodes[i].xpath;
+      queries.push(currentQuery);
+    }
+    return queries;
+  }
+  return null;
+}
 
 var handleMouseMove = function(e) {
   if (e.shiftKey) {
@@ -93,17 +125,18 @@ function saveToLocalStorage(){
   var currentNodeJSON = {};
   currentNodeJSON.label = labelEl.value;
   currentNodeJSON.xpath = queryEl.value;
-  currentNodeJSON.value = queryResults[0]; //0 -> string ; 1 -> nodeCount
+  currentNodeJSON.value = resultsEl.value; 
   currentNodeJSON.timestamp = new Date().getTime();
   nodes.push(currentNodeJSON);
 
   siteJSON.nodes=nodes;
 
   localStorage.setItem(currentURL,JSON.stringify(siteJSON));
+  return true;
 }
 
-var saveBtn = document.getElementById("saveBtn");
-saveBtn.onclick=function() {saveToLocalStorage();};
+var saveForm = document.getElementById("saveForm");
+saveForm.onsubmit=function() {return saveToLocalStorage();};
 
 
 queryEl.addEventListener('keyup', evaluateQuery);
@@ -122,3 +155,4 @@ var request = {
   'height': document.documentElement.offsetHeight
 };
 chrome.extension.sendMessage(request);
+labelEl.focus();  

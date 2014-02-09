@@ -21,8 +21,10 @@
 
 'use strict';
 
-function handleRequest(request, sender, callback) {
+function handleRequest(request, sender, sendResponse) {
   // Simply relay the request. This lets content.js talk to bar.js.
-  chrome.tabs.sendMessage(sender.tab.id, request, callback);
+  chrome.tabs.sendMessage(sender.tab.id, request, function (response){
+  	sendResponse(response);
+  });
 }
 chrome.extension.onMessage.addListener(handleRequest);

@@ -10,12 +10,16 @@
         <div class="box-name">Query:</div>
         <textarea id="query"></textarea>
       </div>
+      <div id="results-box">
+        <div class="box-name">Results (<span id="node-count"></span>):</div>
+        <textarea id="results" readonly="readonly"></textarea>
+      </div>
       <div id="label-box">
         <div class="box-name">Label :</div>
-        <textarea id="label"></textarea>
-      </div>
-      <div id="button-local">
-        <button id="saveBtn">Save to LocalStorage</button>
+        <form id="saveForm" onsubmit="return saveToLocalStorage();">
+        <input type="textarea" id="label"><br>
+        <input type="submit" id="saveBtn" value="Save to LocalStorage">
+        </form>
       </div>
     </div>
     <div id="clear"></div>
