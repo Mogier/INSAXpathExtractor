@@ -2,6 +2,7 @@
    "background": {
       "page": "background.html"
    },
+   "options_page":"page_options.html",
    "content_scripts": [ {
       "css": [ "content.css" ],
       "js": [ "content.js" ],

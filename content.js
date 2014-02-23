@@ -223,7 +223,6 @@ xh.Bar.prototype.highlights = function() {
     'url' : url,
   };
   chrome.runtime.sendMessage(request, function(response){
-    alert("coucou");
   });
 };
 
@@ -309,7 +308,7 @@ xh.Bar.prototype.keyDown_ = function(e) {
   if (this.active_ && e.keyCode === xh.SHIFT_KEYCODE && !e.ctrlKey) {
     this.updateQueryAndBar_(this.currEl_);
   }   
-  else if(this.active_ && e.keyCode === xh.CTRL_KEYCODE && !e.shiftKey) {
+  if(this.active_ && e.keyCode === xh.CTRL_KEYCODE && !e.shiftKey) {
     this.highlights();
   }
 };

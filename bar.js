@@ -70,7 +70,7 @@ var handleRequest = function(request, sender, sendResponse) {
       };
       chrome.extension.sendMessage(newRequest);
     }
-    labelEl.focus();
+    //labelEl.focus();
   }
 };
 
