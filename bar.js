@@ -82,7 +82,8 @@ var extractQueries = function() {
 
     for (var i = 0; i<nodes.length; i++) {
       var currentQuery=nodes[i].xpath;
-      queries.push(currentQuery);
+      var currentLabel = nodes[i].label;
+      queries.push([currentQuery,currentLabel]);
     }
     return queries;
   }

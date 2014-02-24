@@ -93,7 +93,16 @@ xh.makeQueryForElement = function(el) {
 
 xh.highlightNodes = function(nodes) {
   for (var i = 0, l = nodes.length; i < l; i++) {
-    nodes[i].className += ' xh-highlight';
+    nodes[i][0].className += ' xh-highlight';
+    nodes[i][0].onmouseover = createHandler(nodes[i][1]);
+  }
+};
+
+function createHandler( param ) {
+  return function() {
+    this.setAttribute("data-toggle", "tooltip");
+    this.setAttribute("data-placement", "top");
+    this.setAttribute("title", param); 
   }
 };
 
@@ -138,7 +147,7 @@ xh.evaluateQuery = function(query) {
              XPathResult.UNORDERED_NODE_ITERATOR_TYPE) {
     for (var it = xpathResult.iterateNext(); it;
          it = xpathResult.iterateNext()) {
-      nodesToHighlight.push(it);
+      nodesToHighlight.push([it,'']);
       if (str) {
         str += '\n';
       }
@@ -263,13 +272,14 @@ xh.Bar.prototype.handleRequest_ = function(request, sender, callback) {
     var queries = request['queries'];
     var nodes=[];
     for(var i=0;i<queries.length;i++){
-      var xpathResult = document.evaluate(queries[i], document, null, XPathResult.ANY_TYPE, null);
+      var xpathResult = document.evaluate(queries[i][0], document, null, XPathResult.ANY_TYPE, null);
       if (xpathResult.resultType === XPathResult.UNORDERED_NODE_ITERATOR_TYPE) {
         for (var it = xpathResult.iterateNext(); it; it = xpathResult.iterateNext()) {
-          nodes.push(it);
+          nodes.push([it,queries[i][1]]);
         }
       }
     }
+    console.log(nodes);
     xh.highlightNodes(nodes);
   }
 };

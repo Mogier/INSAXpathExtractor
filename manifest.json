@@ -16,6 +16,6 @@
    },
    "manifest_version": 2,
    "name": "INSAXpathExtractor",
-   "version": "1.0.13",
+   "version": "1.1",
    "web_accessible_resources": [ "bar.css", "bar.html", "bar.js" ]
 }
