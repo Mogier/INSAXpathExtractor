@@ -30,6 +30,7 @@ var queryEl = document.getElementById('query');
 var labelEl = document.getElementById('label');
 var resultsEl = document.getElementById('results');
 var nodeCountEl = document.getElementById('node-count');
+var totalElementLabel = document.getElementById('total-count');
 var currentURL;
 
 var nodeCountText = document.createTextNode('0');
@@ -59,6 +60,17 @@ var handleRequest = function(request, sender, sendResponse) {
       if(request['results'][1]>1)
         console.log("More than 1 match for this query : " + queryEl.value);  
     }
+    var totalElements = 0;
+    if(localStorage[currentURL]) {
+      var currentSiteJSON = JSON.parse(localStorage.getItem(currentURL));
+
+      totalElements = currentSiteJSON.nodes.length;
+    }
+    var totalCountText = document.createTextNode(totalElements);
+    if (totalElementLabel.hasChildNodes())
+      totalElementLabel.removeChild(totalElementLabel.firstChild);
+
+    totalElementLabel.appendChild(totalCountText);
   }
   else if(request['type']==='high') {
     var queries = extractQueries();
@@ -156,4 +168,4 @@ var request = {
   'height': document.documentElement.offsetHeight
 };
 chrome.extension.sendMessage(request);
-labelEl.focus();  
+//labelEl.focus();  

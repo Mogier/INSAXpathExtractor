@@ -94,14 +94,13 @@ xh.makeQueryForElement = function(el) {
 xh.highlightNodes = function(nodes) {
   for (var i = 0, l = nodes.length; i < l; i++) {
     nodes[i][0].className += ' xh-highlight';
-    nodes[i][0].onmouseover = createHandler(nodes[i][1]);
+    nodes[i][0].setAttribute("title", nodes[i][1]); 
+    //nodes[i][0].onmouseover = createHandler(nodes[i][1]);
   }
 };
 
 function createHandler( param ) {
   return function() {
-    this.setAttribute("data-toggle", "tooltip");
-    this.setAttribute("data-placement", "top");
     this.setAttribute("title", param); 
   }
 };
@@ -112,6 +111,14 @@ xh.clearHighlights = function() {
   while (els.length) {
     els[0].className = els[0].className.replace(' xh-highlight', '');
   }
+};
+
+xh.clearTooltips = function() {
+  var els = document.getElementsByClassName('xh-highlight');
+  for (var i = 0; i < els.length ; i++) {   
+  console.log(i);  
+    els[i].removeAttribute('title');
+  } 
 };
 
 // Returns [values, nodeCount]. Highlights result nodes, if applicable. Assumes
@@ -194,6 +201,7 @@ xh.Bar = function() {
   document.body.appendChild(this.barFrame_);
 
   document.addEventListener('keydown', this.boundKeyDown_);
+
 };
 
 xh.Bar.prototype.active_ = false;
@@ -245,6 +253,7 @@ xh.Bar.prototype.hideBar_ = function() {
   // Note: It's important to set this.active_ to false here rather than in
   // keyDown_() because hideBar_() could be called via handleRequest_().
   this.active_ = false;
+  xh.clearTooltips();
   xh.clearHighlights();
   document.removeEventListener('mousemove', this.boundMouseMove_);
   this.barFrame_.style.height = '0';
@@ -257,6 +266,7 @@ xh.Bar.prototype.handleRequest_ = function(request, sender, callback) {
     // 'visible'.
     document.body.removeChild(this.barFrame_);
     this.barFrame_.style.visibility = 'visible';
+    this.updateBar_(false);
   } else if (request['type'] === 'evaluate') {
     xh.clearHighlights();
     this.query_ = request['query'];
@@ -279,7 +289,6 @@ xh.Bar.prototype.handleRequest_ = function(request, sender, callback) {
         }
       }
     }
-    console.log(nodes);
     xh.highlightNodes(nodes);
   }
 };
